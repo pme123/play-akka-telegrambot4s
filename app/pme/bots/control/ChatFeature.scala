@@ -111,6 +111,11 @@ trait ChatConversation
   protected def sendDocument(msg: Message, inputFile: InputFile): Future[Message] =
     request(SendDocument(msg.source, inputFile))
 
+  protected def createDefaultButtons(labels: String*): Some[InlineKeyboardMarkup] =
+    Some(InlineKeyboardMarkup(
+      labels.map(label => Seq(
+        InlineKeyboardButton(label, callbackData = Some(callback + label))))))
+
   protected def notExpectedData(other: Event): State = {
     log.warning(s"received unhandled request ${other.event} in state $stateName/${other.stateData}")
     stay()

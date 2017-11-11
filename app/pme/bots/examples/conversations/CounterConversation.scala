@@ -3,12 +3,12 @@ package pme.bots.examples.conversations
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import info.mukel.telegrambot4s.api.Extractors
+import info.mukel.telegrambot4s.models.{InlineKeyboardButton, InlineKeyboardMarkup}
+import pme.bots.callback
 import pme.bots.control.ChatConversation
 import pme.bots.entity.SubscrType.SubscrConversation
 import pme.bots.entity.{Command, FSMState, Subscription}
-import info.mukel.telegrambot4s.api.Extractors
-import info.mukel.telegrambot4s.methods.EditMessageReplyMarkup
-import info.mukel.telegrambot4s.models.{ChatId, InlineKeyboardButton, InlineKeyboardMarkup}
 
 // @formatter:off
 /**
@@ -19,36 +19,30 @@ import info.mukel.telegrambot4s.models.{ChatId, InlineKeyboardButton, InlineKeyb
   *   [Counting] <--------
   *       v              |
   *   markupCounter ------
-  *
   */
 // @formatter:on
 class CounterConversation
-  extends ChatConversation {
+  extends ChatConversation { // it's a conversation
 
-  private val TAG = callback
   private var requestCount = 0
 
   when(Idle) {
     case Event(Command(msg, _), _) =>
-      sendMessage(msg, "Press to increment!"
+      bot.sendMessage(msg, "Press to increment!"
         , replyMarkup = Some(markupCounter(0)))
       // tell where to go next
       goto(Counting)
     case other => notExpectedData(other)
   }
 
-  when(Counting) {
+  when(Counting) { // when the state is Counting, this function is called
     case Event(Command(msg, callbackData: Option[String]), _) =>
-      info("Counting received command!")
       for {
-        data <- callbackData
+        data <- callbackData // extract the callbackData
         Extractors.Int(n) = data
-      } /* do */ {
-        request(
-          EditMessageReplyMarkup(
-            Some(ChatId(msg.source)), // msg.chat.id
-            Some(msg.messageId),
-            replyMarkup = Some(markupCounter(n + 1))))
+      } {
+        // send the updated button
+        bot.sendEditMessage(msg, markupCounter(n + 1))
       }
       // this is a simple conversation that stays always in the same state.
       stay()
@@ -59,10 +53,8 @@ class CounterConversation
     InlineKeyboardMarkup.singleButton(
       InlineKeyboardButton.callbackData(
         s"Press me!!!\n$n - $requestCount",
-        tag(n.toString)))
+        callback + n))
   }
-
-  private def tag: String => String = prefixTag(TAG)
 
   // state to indicate that the count button is already shown to the User
   case object Counting extends FSMState

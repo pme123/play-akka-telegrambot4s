@@ -109,6 +109,10 @@ This allows you to add functionality to all conversation.
 There is a `RunAspect` included that returns the actual data
 from the conversation. This is helpful during development.
 
+Here is an example:
+
+![screenshotlogstate](https://user-images.githubusercontent.com/3437927/32698014-e0a4c5bc-c79c-11e7-9265-94985930d3fb.png)
+
 # Bot Facade
 The [BotFacade](https://github.com/pme123/play-akka-telegrambot4s/blob/0.0.5/app/pme/bots/control/BotFacade.scala)
 helps you with the reply for the Bot. 

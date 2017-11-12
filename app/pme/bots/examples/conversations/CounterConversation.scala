@@ -38,6 +38,7 @@ class CounterConversation
     //  - the State from the last step (using Count(n))
     case Event(Command(msg, _), Count(n)) =>
       val count = n + 1
+      requestCount += 1
       // send the updated button using the BotFacade
       bot.sendEditMessage(msg, countButton(count))
       // this is a simple conversation that stays always in the same state.

@@ -85,18 +85,19 @@ Here a simple conversation:
 
 Here the main difference is that we now have a state that must be handled:
 ```scala
- when(Counting) { // when the state is Counting, this function is called
-    // FSM returns an Event that contains:
-    //  - the Command from the CommandDispatcher
-    //  - the State from the last step (using Count(n))
-    case Event(Command(msg, _), Count(n)) =>
-      val count = n + 1
-      // send the updated button using the BotFacade
-      bot.sendEditMessage(msg, countButton(count))
-      // this is a simple conversation that stays always in the same state.
-      // pass the State to the next step
-      stay() using Count(count)
-  }
+   when(Counting) { // when the state is Counting, this function is called
+     // FSM returns an Event that contains:
+     //  - the Command from the CommandDispatcher
+     //  - the State from the last step (using Count(n))
+     case Event(Command(msg, _), Count(n)) =>
+       val count = n + 1
+       requestCount += 1
+       // send the updated button using the BotFacade
+       bot.sendEditMessage(msg, countButton(count))
+       // this is a simple conversation that stays always in the same state.
+       // pass the State to the next step
+       stay() using Count(count)
+   }
 ```
 Check out the [Akka Documentation](https://doc.akka.io/docs/akka/2.5/scala/fsm.html)
 

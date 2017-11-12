@@ -3,12 +3,9 @@ package pme.bots.examples.conversations
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import info.mukel.telegrambot4s.api.Extractors
-import info.mukel.telegrambot4s.models.{InlineKeyboardButton, InlineKeyboardMarkup}
-import pme.bots.callback
 import pme.bots.control.ChatConversation
 import pme.bots.entity.SubscrType.SubscrConversation
-import pme.bots.entity.{Command, FSMState, Subscription}
+import pme.bots.entity.{Command, FSMData, FSMState, Subscription}
 
 // @formatter:off
 /**
@@ -29,35 +26,34 @@ class CounterConversation
   when(Idle) {
     case Event(Command(msg, _), _) =>
       bot.sendMessage(msg, "Press to increment!"
-        , replyMarkup = Some(markupCounter(0)))
-      // tell where to go next
-      goto(Counting)
+        , countButton(0))
+      // tell where to go next with the first count
+      goto(Counting) using Count(0)
     case other => notExpectedData(other)
   }
 
   when(Counting) { // when the state is Counting, this function is called
-    case Event(Command(msg, callbackData: Option[String]), _) =>
-      for {
-        data <- callbackData // extract the callbackData
-        Extractors.Int(n) = data
-      } {
-        // send the updated button
-        bot.sendEditMessage(msg, markupCounter(n + 1))
-      }
+    // FSM returns an Event that contains:
+    //  - the Command from the CommandDispatcher
+    //  - the State from the last step (using Count(n))
+    case Event(Command(msg, _), Count(n)) =>
+      val count = n + 1
+      // send the updated button using the BotFacade
+      bot.sendEditMessage(msg, countButton(count))
       // this is a simple conversation that stays always in the same state.
-      stay()
+      // pass the State to the next step
+      stay() using Count(count)
   }
 
-  private  def markupCounter(n: Int): InlineKeyboardMarkup = {
-    requestCount += 1
-    InlineKeyboardMarkup.singleButton(
-      InlineKeyboardButton.callbackData(
-        s"Press me!!!\n$n - $requestCount",
-        callback + n))
+  private def countButton(count: Int) = {
+    bot.createDefaultButtons(s"Press me!!!\n$count - $requestCount")
   }
 
   // state to indicate that the count button is already shown to the User
   case object Counting extends FSMState
+
+  // the data of the actual count
+  case class Count(count: Int) extends FSMData
 }
 
 object CounterConversation {

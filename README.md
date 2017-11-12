@@ -14,15 +14,16 @@ This library should help you with:
 Like the name suggests it's supporting only Telegram. The idea is to extend that to other 
 messaging provider at a later time.
 
+**Before you start your own project, please check:**
+
+* [Telegram4J Demo](https://github.com/pme123/play-scala-telegrambot4s)
+* [Demo that uses this library](https://github.com/pme123/play-akka-telegrambot4s-incidents)
 # Token configuration
 It allows you to add the token in the classpath (add `bot.token`-file in the `conf`-directory).
 
 Or pass it as a system property, like `-DBOT_TOKEN=[token]`
 
-# Chat Features
-We support 2 kinds of _chat-features_:
-
-## 1. Service (stateless)
+## Service (stateless)
 To get an information from the Bot that does not need any interaction with 
 the Bot, you can use a Service (stateless request). 
 Here an example:
@@ -73,7 +74,7 @@ import HelloService._
 Here is the complete example: 
 [HelloService](https://raw.githubusercontent.com/pme123/play-akka-telegrambot4s/master/app/pme/bots/examples/services/HelloService.scala)
 
-## 2. Conversation (statelful)
+## Conversation (statelful)
 That's what you actually understand as a chat. 
 A stateful conversation where the Bot guides the user through a defined process (workflow).
 
@@ -84,17 +85,17 @@ Here a simple conversation:
 
 Here the main difference is that we now have a state that must be handled:
 ```scala
-  when(Counting) { // when the state is Counting, this function is called
-    case Event(Command(msg, callbackData: Option[String]), _) =>
-      for {
-        data <- callbackData // extract the callbackData
-        Extractors.Int(n) = data
-      } {
-        // send the updated button
-        bot.sendEditMessage(msg, markupCounter(n + 1))
-      }
+ when(Counting) { // when the state is Counting, this function is called
+    // FSM returns an Event that contains:
+    //  - the Command from the CommandDispatcher
+    //  - the State from the last step (using Count(n))
+    case Event(Command(msg, _), Count(n)) =>
+      val count = n + 1
+      // send the updated button using the BotFacade
+      bot.sendEditMessage(msg, countButton(count))
       // this is a simple conversation that stays always in the same state.
-      stay()
+      // pass the State to the next step
+      stay() using Count(count)
   }
 ```
 Check out the [Akka Documentation](https://doc.akka.io/docs/akka/2.5/scala/fsm.html)
@@ -102,10 +103,41 @@ Check out the [Akka Documentation](https://doc.akka.io/docs/akka/2.5/scala/fsm.h
 A more sophisticated example you find here: 
 [Telegram Bot with Play Framework, Akka FSM, Scala.js, Binding.scala](https://github.com/pme123/play-akka-telegrambot4s-incidents)
 
-
 # Run Aspect
-This allows you to add functionality to all conversation. For example
-get the state of the current conversation.
+This allows you to add functionality to all conversation. 
+There is a `RunAspect` included that returns the actual data
+from the conversation. This is helpful during development.
+
+# Bot Facade
+The [BotFacade](https://github.com/pme123/play-akka-telegrambot4s/blob/0.0.5/app/pme/bots/control/BotFacade.scala)
+helps you with the reply for the Bot. 
+As mentioned above, for now this is Telegram specific.
+
+# Activation
+To activate a Service or a Conversation you need these 2 steps:
+## 1. Application
+You have to add the following to `Module.configure()`
+```
+    // the generic CommandDispatcher
+    bindActor[CommandDispatcher]("commandDispatcher")
+    // starts the Bot itself (Boundary)
+    bind(classOf[BotRunner]).asEagerSingleton()
+
+    // your Services:
+    bind(classOf[HelloServiceSubscription]).asEagerSingleton()
+    // your Conversations:
+    bind(classOf[CounterServiceSubscription]).asEagerSingleton()
+    // your RunAspects
+    bind(classOf[LogStateSubscription]).asEagerSingleton()
+```
+
+## 2. Telegram
+Set the commands with the `BotFather` `/setCommands`, e.g:
+```
+hello - Simple Hello World.
+counter - Counts the time a User hits the button.
+logstate - This prints the content you have created and not persisted.
+```
 
 # Usage
 Add resolver: 

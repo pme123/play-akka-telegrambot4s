@@ -18,30 +18,28 @@ case class BotFacade() extends TelegramBot
   def sendMessage(msg: Message, text: String): Future[Message] =
     request(SendMessage(msg.source, text, parseMode = Some(ParseMode.HTML)))
 
-   def sendMessage(msg: Message, text: String, replyMarkup: Option[ReplyMarkup] = None): Future[Message] =
+  def sendMessage(msg: Message, text: String, replyMarkup: Option[ReplyMarkup] = None): Future[Message] =
     request(SendMessage(msg.source, text, parseMode = Some(ParseMode.HTML), replyMarkup = replyMarkup))
 
-   def sendDocument(msg: Message, inputFile: InputFile): Future[Message] =
+  def sendDocument(msg: Message, inputFile: InputFile): Future[Message] =
     request(SendDocument(msg.source, inputFile))
 
-  def sendEditMessage(msg: Message, markup: InlineKeyboardMarkup): Future[Either[Boolean, Message]] =
+  def sendEditMessage(msg: Message, markup: Option[InlineKeyboardMarkup]): Future[Either[Boolean, Message]] =
     request(
-    EditMessageReplyMarkup(
-      Some(ChatId(msg.source)), // msg.chat.id
-      Some(msg.messageId),
-      replyMarkup = Some(markup)))
+      EditMessageReplyMarkup(
+        Some(ChatId(msg.source)), // msg.chat.id
+        Some(msg.messageId),
+        replyMarkup = markup))
 
-
-   def createDefaultButtons(labels: String*): Some[InlineKeyboardMarkup] =
+  def createDefaultButtons(labels: String*): Some[InlineKeyboardMarkup] =
     Some(InlineKeyboardMarkup(
       labels.map(label => Seq(
         InlineKeyboardButton(label, callbackData = Some(callback + label))))))
 
-
   def fileName(fileId: String, path: String): String =
     fileId.substring(10) + path.substring(path.lastIndexOf("/") + 1)
 
-   def getFilePath(msg: Message, maxSize: Option[Int] = None): Future[Option[(String, String)]] = {
+  def getFilePath(msg: Message, maxSize: Option[Int] = None): Future[Option[(String, String)]] = {
     val optFileId: Option[String] =
       msg.document.map(_.fileId)
         .orElse(msg.video.map(_.fileId))

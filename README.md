@@ -104,6 +104,38 @@ Check out the [Akka Documentation](https://doc.akka.io/docs/akka/2.5/scala/fsm.h
 A more sophisticated example you find here: 
 [Telegram Bot with Play Framework, Akka FSM, Scala.js, Binding.scala](https://github.com/pme123/play-akka-telegrambot4s-incidents)
 
+## Async Behavior
+The library also supports doing your work asynchronously. 
+An extra state is needed. The example is the taken from my Incident-example:
+```scala
+  // the process is asynchronous (getFilePath returns a Future)
+  bot.getFilePath(msg).map {
+    case Some((fileId, path)) =>
+      // standard response to the user (immediate response)
+      bot.sendMessage(msg, "Ok, just add another Photo.")
+      // async: the result is send to itself (ChatConversation) - the uploaded photo is added to the state.
+      self ! ExecutionResult(AddAdditionalInfo, incidentData.copy(assets = Asset(fileId, path) :: incidentData.assets))
+    case _ =>
+      // in any other case try to bring the user back on track
+      bot.sendMessage(msg, "You can only add a Photo.")
+      // async: the result is send to itself (ChatConversation) - no state change.
+      self ! ExecutionResult(AddAdditionalInfo, incidentData)
+  }
+  // async: go to the special step (ChatConversation) - which waits until it gets the ExecutionResult
+  goto(WaitingForExecution)
+```
+So here is the WaitingForExecution:
+```scala
+  when(WaitingForExecution) {
+    case Event(ExecutionResult(state, data), _) =>
+      goto(state) using data
+    case Event(Stay, _) =>
+      stay()
+  }
+```
+As you can see all it does is forwarding the defined state and data received by the ExecutionResult.
+For more info: [Stackoverflow](http://stackoverflow.com/questions/29489564/akka-fsm-goto-within-future)
+
 # Run Aspect
 This allows you to add functionality to all conversation. 
 There is a `RunAspect` included that returns the actual data
@@ -137,7 +169,7 @@ You have to add the following to `Module.configure()`
 ```
 
 ## 2. Telegram
-Set the commands with the `BotFather` `/setCommands`, e.g:
+Set the commands with the `BotFather` `/setcommands`, e.g:
 ```
 hello - Simple Hello World.
 counter - Counts the time a User hits the button.

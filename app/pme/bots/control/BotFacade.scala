@@ -4,6 +4,7 @@ import info.mukel.telegrambot4s.api.declarative.{Callbacks, Commands}
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models.{InlineKeyboardMarkup, _}
+import pme.bots.entity.CallbackTag
 import pme.bots.{botToken, callback}
 
 import scala.concurrent.Future
@@ -35,6 +36,18 @@ case class BotFacade() extends TelegramBot
     Some(InlineKeyboardMarkup(
       labels.map(label => Seq(
         InlineKeyboardButton(label, callbackData = Some(callback + label))))))
+
+  // creates buttons for a Seq of CallbackTags
+  // by default 2 buttons per row
+  protected def incidentTagSelector(tags: Seq[CallbackTag], columns: Int = 2): InlineKeyboardMarkup =
+    InlineKeyboardMarkup(
+      tags.grouped(columns).map { row =>
+        row.map(t => InlineKeyboardButton.callbackData(t.label, tag(t.name)))
+      }.toSeq
+    )
+
+  // prefix a callback name with the standard prefix
+  protected def tag(name: String): String = callback + name
 
   def fileName(fileId: String, path: String): String =
     fileId.substring(10) + path.substring(path.lastIndexOf("/") + 1)

@@ -1,7 +1,7 @@
 name := """play-akka-telegrambot4s"""
 organization := "pme"
 
-version := "0.0.1"
+version := "0.0.9"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

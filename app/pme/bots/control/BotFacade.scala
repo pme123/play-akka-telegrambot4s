@@ -25,6 +25,9 @@ case class BotFacade() extends TelegramBot
   def sendDocument(msg: Message, inputFile: InputFile): Future[Message] =
     request(SendDocument(msg.source, inputFile))
 
+  def sendPhoto(msg: Message, inputFile: InputFile): Future[Message] =
+    request(SendPhoto(msg.source, inputFile))
+
   def sendEditMessage(msg: Message, markup: Option[InlineKeyboardMarkup]): Future[Either[Boolean, Message]] =
     request(
       EditMessageReplyMarkup(

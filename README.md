@@ -1,5 +1,6 @@
 # play-akka-telegrambot4s
 [![Build Status](https://travis-ci.org/pme123/play-akka-telegrambot4s.svg?branch=master)](https://travis-ci.org/pme123/play-akka-telegrambot4s)
+[![](https://jitpack.io/v/pme123/play-akka-telegrambot4s.svg)](https://jitpack.io/#pme123/play-akka-telegrambot4s)
 
 Small library to handle multiple conversations with a telegram bot.
 

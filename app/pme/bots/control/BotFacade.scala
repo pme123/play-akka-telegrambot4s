@@ -4,7 +4,7 @@ import info.mukel.telegrambot4s.api.declarative.{Callbacks, Commands}
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models.{InlineKeyboardMarkup, _}
-import pme.bots.entity.CallbackTag
+import pme.bots.entity.{BadArgumentException, CallbackTag}
 import pme.bots.{botToken, callback}
 
 import scala.concurrent.Future
@@ -55,7 +55,8 @@ case class BotFacade() extends TelegramBot
   def fileName(fileId: String, path: String): String =
     fileId.substring(10) + path.substring(path.lastIndexOf("/") + 1)
 
-  def getFilePath(msg: Message, maxSize: Option[Int] = None): Future[Option[(String, String)]] = {
+  // if successful it returns a pair (fileId, fileUrl)
+  def getFilePath(msg: Message, maxSize: Option[Int] = None): Future[(String, String)] = {
     val optFileId: Option[String] =
       msg.document.map(_.fileId)
         .orElse(msg.video.map(_.fileId))
@@ -66,16 +67,13 @@ case class BotFacade() extends TelegramBot
         request(GetFile(fileId)).map { (file: File) =>
           file.filePath match {
             case Some(path) =>
-              Some((file.fileId, fileUrl(path)))
+              (file.fileId, fileUrl(path))
             case _ =>
-              sendMessage(msg, s"I could not retrieve the File from the fileId: $fileId")
-              None
+              throw  BadArgumentException(s"I could not retrieve the File from the fileId: $fileId")
           }
         }
-      case other =>
-        sendMessage(msg, "Sorry but you have to add a file to the chat. (Use button <i>send file</i>)\n" +
-          s"Not expected: $other / $msg")
-        Future(None)
+      case _ =>
+        throw  BadArgumentException("Sorry but you have to add a file to the chat.")
     }
   }
 

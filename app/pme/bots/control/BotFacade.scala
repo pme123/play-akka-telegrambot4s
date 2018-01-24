@@ -62,7 +62,7 @@ case class BotFacade() extends TelegramBot
         .orElse(msg.video.map(_.fileId))
         .orElse(extractPhoto(msg, maxSize))
 
-    optFileId match {
+    Future.successful(optFileId) flatMap {
       case Some(fileId: String) =>
         request(GetFile(fileId)).map { (file: File) =>
           file.filePath match {

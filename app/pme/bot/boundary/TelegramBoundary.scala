@@ -1,19 +1,17 @@
-package pme.bots.boundary
+package pme.bot.boundary
 
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.ActorRef
-import pme.bots._
-import pme.bots.entity.{Command, Logger}
 import info.mukel.telegrambot4s.api.declarative.Callbacks
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods.SendMessage
 import info.mukel.telegrambot4s.models._
 import play.api.Configuration
 import play.api.inject.ApplicationLifecycle
-
-import scala.concurrent.Future
-
+import pme.bot.callback
+import pme.bot.entity.{BotContext, Command, Logger}
+import pme.bot.entity.BotContext.settings
 /**
   * Created by pascal.mengelt on 27.12.2016.
   */
@@ -25,7 +23,7 @@ class TelegramBoundary @Inject()(@Named("commandDispatcher") val commandDispatch
     with Callbacks
     with Logger {
 
-  def token: String = botToken
+  def token: String = settings.token
   override def pollingInterval: Int = 2
 
   override def receiveMessage(msg: Message): Unit = {
@@ -47,12 +45,9 @@ class TelegramBoundary @Inject()(@Named("commandDispatcher") val commandDispatch
     }
   }
 
-  private lazy val acceptUsers: List[Int] = config.get[String]("bots.accept.users").split(",").toList.filter(_.trim.nonEmpty).map(_.toInt)
-
   private def checkUser(msg: Message): Option[User] = {
     val user = msg.from.get
-    val acceptsUser = acceptUsers.isEmpty || acceptUsers.contains(user.id)
-    if (acceptsUser)
+    if (BotContext.acceptsUser(user.id))
       Some(user)
     else {
       warn(s"A User tried to access the SFnImportAdapter without rights: $user")

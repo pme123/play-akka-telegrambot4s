@@ -1,11 +1,11 @@
-package pme.bots.examples.conversations
+package pme.bot.examples.conversations
 
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import pme.bots.control.ChatConversation
-import pme.bots.entity.SubscrType.SubscrConversation
-import pme.bots.entity.{Command, FSMData, FSMState, Subscription}
+import pme.bot.control.ChatConversation
+import pme.bot.entity.SubscrType.SubscrConversation
+import pme.bot.entity.{Command, FSMData, FSMState, Subscription}
 
 // @formatter:off
 /**

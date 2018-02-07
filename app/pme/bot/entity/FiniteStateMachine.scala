@@ -1,4 +1,4 @@
-package pme.bots.entity
+package pme.bot.entity
 
 /**
   * Describes a state of our FSM.

@@ -1,4 +1,4 @@
-package pme.bots.entity
+package pme.bot.entity
 
 import info.mukel.telegrambot4s.models.Message
 

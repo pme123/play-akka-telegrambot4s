@@ -1,11 +1,12 @@
-package pme.bots.control
+package pme.bot.control
 
 import info.mukel.telegrambot4s.api.declarative.{Callbacks, Commands}
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models.{InlineKeyboardMarkup, _}
-import pme.bots.entity.{BadArgumentException, CallbackTag}
-import pme.bots.{botToken, callback}
+import pme.bot.callback
+import pme.bot.entity.BotContext.settings
+import pme.bot.entity.{BadArgumentException, CallbackTag}
 
 import scala.concurrent.Future
 
@@ -14,7 +15,7 @@ case class BotFacade() extends TelegramBot
   with Commands
   with Callbacks {
 
-  def token: String = botToken
+  def token: String = settings.token
 
   def sendMessage(msg: Message, text: String): Future[Message] =
     request(SendMessage(msg.source, text, parseMode = Some(ParseMode.HTML)))

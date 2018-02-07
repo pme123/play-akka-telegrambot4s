@@ -1,4 +1,4 @@
-package pme.bots.entity
+package pme.bot.entity
 
 /**
   * Marker trait for all internal Exceptions, that are handled.

@@ -1,11 +1,11 @@
-package pme.bots.examples.services
+package pme.bot.examples.services
 
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import pme.bots.control.ChatService
-import pme.bots.entity.SubscrType.SubscrService
-import pme.bots.entity.{Command, Subscription}
+import pme.bot.control.ChatService
+import pme.bot.entity.SubscrType.SubscrService
+import pme.bot.entity.{Command, Subscription}
 
 /**
   * The user sends command /hello

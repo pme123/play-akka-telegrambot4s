@@ -1,4 +1,4 @@
-package pme.bots.entity
+package pme.bot.entity
 
 import LogLevel._
 import scala.collection.mutable

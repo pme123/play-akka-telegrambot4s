@@ -1,8 +1,8 @@
-package pme.bots.control
+package pme.bot.control
 
 import akka.actor.{Actor, FSM}
-import pme.bots.entity.LogLevel._
-import pme.bots.entity._
+import pme.bot.entity.LogLevel._
+import pme.bot.entity._
 
 
 trait ChatService
@@ -17,7 +17,7 @@ trait ChatConversation
 
   val bot = BotFacade()
 
-  import pme.bots.entity.RunAspect._
+  import pme.bot.entity.RunAspect._
   // starts every conversation
   startWith(Idle, NoData)
 

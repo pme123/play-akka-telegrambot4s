@@ -1,9 +1,9 @@
-package pme.bots.control
+package pme.bot.control
 
 import akka.actor.{Actor, ActorRef, PoisonPill}
-import pme.bots.botToken
-import pme.bots.entity.SubscrType.{SubscrAspect, SubscrConversation, SubscrService}
-import pme.bots.entity._
+import pme.bot.entity.BotContext.settings
+import pme.bot.entity.SubscrType.{SubscrAspect, SubscrConversation, SubscrService}
+import pme.bot.entity._
 import info.mukel.telegrambot4s.api.declarative.{Callbacks, Commands}
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods.SendMessage
@@ -22,7 +22,7 @@ class CommandDispatcher
     with Callbacks
     with Logger {
 
-  def token: String = botToken
+  def token: String = settings.token
 
   private val subscriptions: mutable.Map[String, Subscription] = mutable.Map()
   private val conversations: mutable.Map[Long, (Subscription, ActorRef)] = mutable.Map()

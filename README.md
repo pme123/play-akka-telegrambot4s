@@ -6,7 +6,12 @@ Small library to handle multiple conversations with a telegram bot.
 
 # This project is under development!
 
-This library should help you with:
+# What
+After the first steps with Telegram we like to add Conversations and Services in an effective way.
+
+![image](https://user-images.githubusercontent.com/3437927/35961627-8e0c44d6-0cae-11e8-9785-83bbf067426a.png)
+
+For that we add another layer (library) that should help you with:
 
 * Handling the state of each user.
 * Create a FSM (finite state machine) to design the conversation.
@@ -19,7 +24,8 @@ messaging provider at a later time.
 
 **Before you start your own project, please check:**
 
-* [Telegram4J Demo](https://github.com/pme123/play-scala-telegrambot4s)
+* [Telegram4J Demo with Play](https://github.com/pme123/play-scala-telegrambot4s)
+* [Telegram4J Demo Scala only](https://github.com/pme123/scala-telegrambot4s)
 * [Demo that uses this library](https://github.com/pme123/play-akka-telegrambot4s-incidents)
 # Token configuration
 It allows you to add the token in the classpath (add `bot.token`-file in the `conf`-directory).

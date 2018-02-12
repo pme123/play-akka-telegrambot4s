@@ -28,9 +28,9 @@ messaging provider at a later time.
 * [Telegram4J Demo Scala only](https://github.com/pme123/scala-telegrambot4s)
 * [Demo that uses this library](https://github.com/pme123/play-akka-telegrambot4s-incidents)
 # Token configuration
-It allows you to add the token in the classpath (add `bot.token`-file in the `conf`-directory).
+It allows you to add the token in the classpath (add `pme.bot.token`-file in the `conf`-directory).
 
-Or pass it as a system property, like `-DBOT_TOKEN=[token]`
+Or pass it as a system property, like `-Dpme.bot.token=[token]`
 
 ## Service (stateless)
 To get an information from the Bot that does not need any interaction with 
